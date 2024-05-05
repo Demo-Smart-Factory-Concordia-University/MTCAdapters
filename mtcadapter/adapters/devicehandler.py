@@ -1,6 +1,7 @@
 import socket
 import socketserver
 import getpass
+import mtcadapter
 from mtcadapter.exceptions import ImproperlyConfigured
 from mtcadapter.mtcdevices import MTCDevice
 
@@ -45,10 +46,11 @@ class DeviceHandler(socketserver.BaseRequestHandler):
         else:
             self.request.sendall(("|avail|UNAVAILABLE\n").encode())
             return
-
-        # sends logged user to agent
-        self.request.sendall(("|operator|" + getpass.getuser() + "\n").encode())
         self.request.settimeout(0.01)
+
+        # send initial SHDR data
+        self.request.sendall(("|operator|" + getpass.getuser() + "\n").encode())
+        self.request.sendall((f"* adapterVersion: {mtcadapter.__version__}\n").encode())
         self.send_shdr(self.device.read_data())
         self.send_shdr(self.device.on_connect())
 
@@ -56,7 +58,6 @@ class DeviceHandler(socketserver.BaseRequestHandler):
             try:
                 data = self.request.recv(1024)
             except socket.timeout:
-                # read data here
                 device_data = self.device.read_data()
                 for id in device_data:
                     if id not in self.__data_old__:
