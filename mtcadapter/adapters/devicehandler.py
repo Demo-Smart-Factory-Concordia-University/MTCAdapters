@@ -11,6 +11,7 @@ class DeviceHandler(socketserver.BaseRequestHandler):
     """
 
     device_class = None
+    HEARTBEAT_TIMEOUT = 10000
 
     __data_old__ = {}
 
@@ -71,4 +72,4 @@ class DeviceHandler(socketserver.BaseRequestHandler):
                 break
 
             if data == "* PING\r\n".encode():
-                self.request.sendall("* PONG 60000\n".encode())
+                self.request.sendall(f"* PONG {str(self.HEARTBEAT_TIMEOUT)}\n".encode())
