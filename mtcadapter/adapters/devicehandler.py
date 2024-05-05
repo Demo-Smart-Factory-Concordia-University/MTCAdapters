@@ -9,6 +9,7 @@ from mtcadapter.mtcdevices import MTCDevice
 class DeviceHandler(socketserver.BaseRequestHandler):
     """
     Reads SHDR data from a MTCDevice
+    Defintion of the Adapter Agent protocol : https://www.mtcup.org/Protocol
     """
 
     device_class = None
