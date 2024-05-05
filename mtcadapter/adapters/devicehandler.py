@@ -51,6 +51,7 @@ class DeviceHandler(socketserver.BaseRequestHandler):
 
         # send initial SHDR data
         self.request.sendall(("|operator|" + getpass.getuser() + "\n").encode())
+        self.request.sendall(("* shdrVersion: 2.0\n").encode())
         self.request.sendall((f"* adapterVersion: {mtcadapter.__version__}\n").encode())
         self.send_shdr(self.device.read_data())
         self.send_shdr(self.device.on_connect())
