@@ -14,5 +14,5 @@ setup(
     packages=find_packages(),
     install_requires=['psutil',
                       'requests',
-                      'dotenv'],
+                      'python-dotenv'],
 )
