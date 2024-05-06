@@ -5,23 +5,23 @@ from mtcadapter.exceptions import ImproperlyConfigured
 
 class MTCAdapter(socketserver.TCPServer):
     """
-    Implements a MTConnect Adapter server
-    Reads SHDR data from deviceHandler_class
+    Implements a MTConnect Adapter as a TCP server
+    Handles requests from the Agent with agentRequestHandler_class
     """
 
     adapter_port = 7878
-    deviceHandler_class = None
+    agentRequestHandler_class = None
 
     def __init__(self):
         """
         Constructor
         """
         # Configuration validations
-        if self.deviceHandler_class is None:
+        if self.agentRequestHandler_class is None:
             raise ImproperlyConfigured("MTCAdapterRelay requires the attribute 'deviceHandler_class' to be defined")
 
         print(f"Starting Adapter on port {self.adapter_port}")
-        socketserver.TCPServer.__init__(self, ('', self.adapter_port), self.deviceHandler_class)
+        socketserver.TCPServer.__init__(self, ('', self.adapter_port), self.agentRequestHandler_class)
 
     def run(self):
         """

@@ -1,13 +1,13 @@
-from mtcadapter.adapters import MTCAdapter, DeviceHandler
+from mtcadapter.adapters import MTCAdapter, AgentRequestHandler
 from mtcadapter.mtcdevices import HardwareSensors
 
 
-class MyHardwareHandler(DeviceHandler):
+class MyHardwareHandler(AgentRequestHandler):
     device_class = HardwareSensors
 
 
 class MyAdapter(MTCAdapter):
-    deviceHandler_class = MyHardwareHandler
+    agentRequestHandler_class = MyHardwareHandler
     adapter_port = 7878
 
 

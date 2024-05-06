@@ -1,4 +1,4 @@
-from mtcadapter.adapters import MTCAdapter, DeviceHandler
+from mtcadapter.adapters import MTCAdapter, AgentRequestHandler
 from mtcadapter.mtcdevices.sick import SICKProximitySensor
 
 """
@@ -9,12 +9,12 @@ must be set
 """
 
 
-class MySIG350Handler(DeviceHandler):
+class MySIG350Handler(AgentRequestHandler):
     device_class = SICKProximitySensor
 
 
 class MyAdapter(MTCAdapter):
-    deviceHandler_class = MySIG350Handler
+    agentRequestHandler_class = MySIG350Handler
     adapter_port = 7878
 
 

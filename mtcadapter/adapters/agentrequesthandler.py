@@ -6,9 +6,10 @@ from mtcadapter.exceptions import ImproperlyConfigured
 from mtcadapter.mtcdevices import MTCDevice
 
 
-class DeviceHandler(socketserver.BaseRequestHandler):
+class AgentRequestHandler(socketserver.BaseRequestHandler):
     """
-    Reads SHDR data from a MTCDevice
+    Handles requests from the MTConnect Agent
+    Reads data from a MTCDevice and sends them in SHDR format to the connected agent
     Defintion of the Adapter Agent protocol : https://www.mtcup.org/Protocol
     """
 
