@@ -32,6 +32,9 @@ class SICKProximitySensor(MTCDevice):
         if self.device_alias is None:
             raise ImproperlyConfigured("SICKProximitySensor requires the attribute 'device_alias' to be defined")
         self.session = requests.Session()
+        print("Proximity Sensor configured for:")
+        print(f" - SIG350: {self.ip_address}")
+        print(f" - Device: {self.device_alias}")
 
     def manufacturer(self):
         dev_identification = requests.get(f"http://{self.ip_address}/iolink/v1/masters/1/identification",
