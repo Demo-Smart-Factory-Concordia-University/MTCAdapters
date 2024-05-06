@@ -1,0 +1,1 @@
+from .sig350proximitysensor import SICKProximitySensor

@@ -53,6 +53,12 @@ class DeviceHandler(socketserver.BaseRequestHandler):
         self.request.sendall(("|operator|" + getpass.getuser() + "\n").encode())
         self.request.sendall(("* shdrVersion: 2.0\n").encode())
         self.request.sendall((f"* adapterVersion: {mtcadapter.__version__}\n").encode())
+        manufacturer = self.device.manufacturer()
+        serialNumber = self.device.serialNumber()
+        if manufacturer:
+            self.request.sendall((f"* manufacturer: {manufacturer}\n").encode())
+        if serialNumber:
+            self.request.sendall((f"* serialNumber: {serialNumber}\n").encode())
         self.send_shdr(self.device.read_data())
         self.send_shdr(self.device.on_connect())
 

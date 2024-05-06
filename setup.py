@@ -12,5 +12,7 @@ setup(
     author_email=mtcadapter.__email__,
     license='BSD 3-Clause License',
     packages=find_packages(),
-    install_requires=['psutil',],
+    install_requires=['psutil',
+                      'requests',
+                      'dotenv'],
 )
