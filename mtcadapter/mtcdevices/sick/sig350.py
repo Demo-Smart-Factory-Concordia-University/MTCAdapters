@@ -6,16 +6,15 @@ from mtcadapter.exceptions import ImproperlyConfigured
 
 
 """
-SICK AG Proximity sensor connected to a SIG350 Sensor Integration Gateway
-
+SICK SIG350 Sensor Integration Gateway
 Uses the SIG350 REST API to read sensor data
 """
 
 
-class SICKProximitySensor(MTCDevice):
+class SIG350(MTCDevice):
 
     ip_address = os.getenv('SIG350_IP') or None
-    device_alias = os.getenv('DEVICE_ALIAS') or None
+    sensors = None   # dictionnary with format {'devicealias': SICK_SIG350_Sensor_Class}
 
     sensor_timeout = 5
 
@@ -23,32 +22,45 @@ class SICKProximitySensor(MTCDevice):
     health_check_retries = 10
     health_check_timeout = 10
 
-    __available__ = 0
-
     def __init__(self):
         # Configuration validations
         if self.ip_address is None:
-            raise ImproperlyConfigured("SICKProximitySensor requires the attribute 'ip_address' to be defined")
-        if self.device_alias is None:
-            raise ImproperlyConfigured("SICKProximitySensor requires the attribute 'device_alias' to be defined")
+            raise ImproperlyConfigured("SIG350Adapter requires the attribute 'ip_address' to be defined")
+        if self.sensors is None:
+            raise ImproperlyConfigured("SIG350Adapter requires the attribute 'sensors' to be defined")
+
         self.session = requests.Session()
-        print("Proximity Sensor configured for:")
-        print(f" - SIG350: {self.ip_address}")
-        print(f" - Device: {self.device_alias}")
+        print("SIG350 connection configuration:")
+        print(f" - URL: {self.ip_address}")
+
+        # connect sensors
+        print("\nConnected sensor(s):")
+        self._identification = {}
+        self.devices = {}
+        for device_alias in self.sensors:
+            self.devices[device_alias] = self.sensors[device_alias](self.session, self.ip_address, device_alias)
+            self._identification[device_alias] = self.devices[device_alias].identification
+            print(f" - On {device_alias}:")
+            for key in self._identification[device_alias]:
+                print("   -", key, ":", self._identification[device_alias][key])
+            print()
+        self.__available__ = 1
 
     def manufacturer(self):
+        """ SIG350 manufacturer """
         dev_identification = requests.get(f"http://{self.ip_address}/iolink/v1/masters/1/identification",
                                           timeout=self.health_check_timeout).json()
         return dev_identification['vendorName']
 
     def serialNumber(self):
+        """ SIG350 serial number """
         dev_identification = requests.get(f"http://{self.ip_address}/iolink/v1/masters/1/identification",
                                           timeout=self.health_check_timeout).json()
         return dev_identification['serialNumber']
 
     def health_check(self):
         """
-        Return health status of device connection
+        Return health status of SIG350 connection
         """
         self.session.close()
         healthy = False
@@ -62,7 +74,7 @@ class SICKProximitySensor(MTCDevice):
             except requests.exceptions.ConnectionError:
                 if retries == self.health_check_retries:
                     return False
-                print(f'Failed to connect to sensor (attempt #{retries})')
+                print(f'Failed to connect to SIG350 (attempt #{retries})')
                 healthy = False
                 time.sleep(self.health_check_interval)
         self.session = requests.Session()
@@ -71,18 +83,9 @@ class SICKProximitySensor(MTCDevice):
 
     def read_data(self):
         """
-        Read and return device data
+        Read and return data from all connected sensors
         """
-        try:
-            resp = self.session.get(f"http://{self.ip_address}/iolink/v1/devices/{self.device_alias}/processdata/value",
-                                    timeout=self.sensor_timeout).json()
-        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-            self.__available__ = 0
-            return {'avail': 'UNAVAILABLE'}
-        if self.__available__ == 0:
-            self.__available__ = 1
-            return {'avail': 'AVAILABLE'}
-        if resp['getData']['cqValue']:
-            return {'trigger': '1'}
-        else:
-            return {'trigger': '0'}
+        ret = {}
+        for device in self.devices:
+            ret = ret | self.devices[device].read_data()
+        return ret
