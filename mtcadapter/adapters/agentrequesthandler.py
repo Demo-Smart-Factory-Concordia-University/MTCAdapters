@@ -15,6 +15,7 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
 
     device_class = None
     HEARTBEAT_TIMEOUT = 10000
+    DEBUG = False
 
     __data_old__ = {}
 
@@ -37,6 +38,8 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
         """
         for id in data:
             self.request.sendall((f"|{id}|{data[id]}\n").encode())
+            if self.DEBUG:
+                print(f"|{id}|{data[id]}\n")
 
     def handle(self):
         """
