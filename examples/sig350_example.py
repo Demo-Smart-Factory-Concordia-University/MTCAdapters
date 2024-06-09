@@ -1,4 +1,4 @@
-from mtcadapter.adapters import MTCAdapter, AgentRequestHandler
+from mtcadapter.adapters import MTCAdapter
 from mtcadapter.mtcdevices.sick import SIG350, SICK_IMC30_Sensor, SICK_AHS_AHM36_Sensor
 
 """
@@ -15,13 +15,9 @@ class MySIG350(SIG350):
                'master1port8': SICK_AHS_AHM36_Sensor}
 
 
-class MySIG350Handler(AgentRequestHandler):
-    device_class = MySIG350
-
-
 class MyAdapter(MTCAdapter):
-    agentRequestHandler_class = MySIG350Handler
     adapter_port = 7878
+    device_class = MySIG350
 
 
 def main():
