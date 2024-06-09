@@ -39,7 +39,7 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
         for id in data:
             self.request.sendall((f"|{id}|{data[id]}\n").encode())
             if self.DEBUG:
-                print(f"|{id}|{data[id]}\n")
+                print(f"|{id}|{data[id]}")
 
     def handle(self):
         """
@@ -76,6 +76,8 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
                         self.__data_old__[id] = ''
                     if device_data[id] != self.__data_old__[id]:
                         self.request.sendall((f"|{id}|{device_data[id]}\n").encode())
+                        if self.DEBUG:
+                            print(f"|{id}|{device_data[id]}")
                         if id != 'avail':
                             self.__data_old__[id] = device_data[id]
                 continue
