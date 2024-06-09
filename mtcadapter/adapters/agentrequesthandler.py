@@ -37,9 +37,14 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
         Send SHDR data to agent
         """
         for id in data:
-            self.request.sendall((f"|{id}|{data[id]}\n").encode())
-            if self.DEBUG:
-                print(f"|{id}|{data[id]}")
+            if id not in self.__data_old__:
+                self.__data_old__[id] = ''
+            if data[id] != self.__data_old__[id]:
+                self.request.sendall((f"|{id}|{data[id]}\n").encode())
+                if self.DEBUG:
+                    print(f"|{id}|{data[id]}")
+                if id != 'avail':
+                    self.__data_old__[id] = data[id]
 
     def handle(self):
         """
@@ -71,15 +76,7 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
                 data = self.request.recv(1024)
             except socket.timeout:
                 device_data = self.device.read_data()
-                for id in device_data:
-                    if id not in self.__data_old__:
-                        self.__data_old__[id] = ''
-                    if device_data[id] != self.__data_old__[id]:
-                        self.request.sendall((f"|{id}|{device_data[id]}\n").encode())
-                        if self.DEBUG:
-                            print(f"|{id}|{device_data[id]}")
-                        if id != 'avail':
-                            self.__data_old__[id] = device_data[id]
+                self.send_shdr(device_data)
                 continue
 
             if not data:
