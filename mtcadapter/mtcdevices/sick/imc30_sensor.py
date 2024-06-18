@@ -31,6 +31,10 @@ class SICK_IMC30_Sensor(SICK_SIG350_Sensor):
         except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
             self.__available__ = 0
             return {'avail': 'UNAVAILABLE'}
+
+        if 'iolink' not in resp:
+            return None
+
         if self.__available__ == 0:
             self.__available__ = 1
             return {'avail': 'AVAILABLE'}

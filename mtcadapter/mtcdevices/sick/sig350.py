@@ -87,5 +87,7 @@ class SIG350(MTCDevice):
         """
         ret = {}
         for device in self.devices:
-            ret = ret | self.devices[device].read_data()
+            r = self.devices[device].read_data()
+            if r:
+                ret = ret | r
         return ret
