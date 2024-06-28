@@ -19,6 +19,9 @@ class SICK_IMC30_Sensor(SICK_SIG350_Sensor):
     # MTConnect DataItem ID
     trigger_id = 'trigger'
 
+    # Trigger threshold
+    threshold = 15
+
     __available__ = 1
 
     def read_data(self):
@@ -39,7 +42,7 @@ class SICK_IMC30_Sensor(SICK_SIG350_Sensor):
             self.__available__ = 1
             return {'avail': 'AVAILABLE'}
 
-        if resp['iolink']['value'][0] > 15:
+        if resp['iolink']['value'][0] > self.threshold:
             return {self.trigger_id: '0'}
         else:
             return {self.trigger_id: '1'}
