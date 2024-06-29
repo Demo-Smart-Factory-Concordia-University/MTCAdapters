@@ -76,8 +76,13 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
                 print("Connection from Agent closed")
                 break
 
-            if data == "* PING\r\n".encode():
+            if self.DEBUG:
+                print("Agent sent:", data.decode())
+
+            if "* PING" in data.decode():
                 self.request.sendall(f"* PONG {str(self.HEARTBEAT_TIMEOUT)}\n".encode())
+                if self.DEBUG:
+                    print(f"* PONG {str(self.HEARTBEAT_TIMEOUT)}")
 
 
 class MTCAdapter(socketserver.TCPServer):
