@@ -1,5 +1,5 @@
 import requests
-from .sig30_sensor import SICK_SIG350_Sensor
+from .sig350_sensor import SICK_SIG350_Sensor
 
 
 """
