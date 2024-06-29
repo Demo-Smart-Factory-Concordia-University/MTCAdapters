@@ -30,6 +30,10 @@ class SIG350(MTCDevice):
             raise ImproperlyConfigured("SIG350Adapter requires the attribute 'sensors' to be defined")
 
         self.session = requests.Session()
+        print("============================================================")
+        print("MTConnect Adapter for SICK SIG350 Sensor Integration Gateway")
+        print("(c) Concordia University DemoFactory 2024")
+        print("============================================================")
         print("SIG350 connection configuration:")
         print(f" - URL: {self.ip_address}")
 
