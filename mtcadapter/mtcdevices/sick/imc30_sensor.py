@@ -22,6 +22,8 @@ class SICK_IMC30_Sensor(SICK_SIG350_Sensor):
     # Trigger threshold
     threshold = 15
 
+    DEBUG = False
+
     __available__ = 1
 
     def read_data(self):
@@ -34,6 +36,9 @@ class SICK_IMC30_Sensor(SICK_SIG350_Sensor):
         except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
             self.__available__ = 0
             return {'avail': 'UNAVAILABLE'}
+
+        if self.DEBUG:
+            print('[SICK_IMC30_Sensor DEBUG]', resp)
 
         if 'iolink' not in resp:
             return None
