@@ -16,6 +16,11 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
     HEARTBEAT_TIMEOUT = 10000
     DEBUG = False
 
+    # TCP Keepalive configuration
+    TCP_KEEPIDLE = 60         # Idle time before sending keepalive probes
+    TCP_KEEPINTVL = 10        # Interval between keepalive probes
+    TCP_KEEPCNT = 3           # Number of failed probes before closing
+
     __data_old__ = {}
 
     def __init__(self, request, client_address, server):
@@ -44,6 +49,16 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
         Handle connection from MTConnect Agent
         """
         print("Connection from {}".format(self.client_address[0]))
+
+        # enable TCP keepalive
+        self.request.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+
+        # configure keepalive options
+        self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, self.TCP_KEEPIDLE)
+        self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, self.TCP_KEEPINTVL)
+        self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, self.TCP_KEEPCNT)
+
+        # send avail status
         if self.device.health_check():
             self.request.sendall(("|avail|AVAILABLE\n").encode())
         else:
