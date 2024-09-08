@@ -71,6 +71,9 @@ class AgentRequestHandler(socketserver.BaseRequestHandler):
                 device_data = self.device.read_data()
                 self.send_shdr(device_data)
                 continue
+            except (ConnectionResetError, BrokenPipeError):
+                print("Connection from Agent closed")
+                break
 
             if not data:
                 print("Connection from Agent closed")
