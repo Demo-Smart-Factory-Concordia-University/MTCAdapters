@@ -5,6 +5,7 @@ Uses RS485 Modbus RTU for communication
 """
 
 import minimalmodbus
+import termios
 from mtcadapter.mtcdevices import MTCDevice
 from mtcadapter.exceptions import ImproperlyConfigured
 
@@ -44,7 +45,7 @@ class WTVB01(MTCDevice):
                                                mode=minimalmodbus.MODE_RTU,
                                                debug=self.DEBUG)
         self.sensor.serial.baudrate = self.baud_rate
-        self.sensor.close_port_after_each_call = True
+        self.sensor.close_port_after_each_call = False
         self.sensor.clear_buffers_before_each_transaction = True
 
         print("============================================================")
@@ -94,13 +95,14 @@ class WTVB01(MTCDevice):
             temp = self.temperature()
             disp = self.displacements()
             freq = self.vibration_frequencies()
-        except IOError:
+        except (IOError, termios.error):
             self.__available__ = 0
+            self.sensor.serial.close()
             return {'avail': 'UNAVAILABLE'}
 
         if self.__available__ == 0:
-            self.__available__ = 1
-            return {'avail': 'AVAILABLE'}
+            if self.health_check():
+                return {'avail': 'AVAILABLE'}
 
         return {
             key: value
