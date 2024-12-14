@@ -6,6 +6,8 @@ Uses RS485 Modbus RTU for communication
 
 import minimalmodbus
 import termios
+import os
+import time
 from mtcadapter.mtcdevices import MTCDevice
 from mtcadapter.exceptions import ImproperlyConfigured
 
@@ -40,6 +42,13 @@ class WTVB01(MTCDevice):
         if self.port is None:
             raise ImproperlyConfigured("WTVB01 requires the attribute 'port' to be defined")
 
+        # Checks if a device is connected to the serial port
+        if not self._check_port():
+            print(f'No device connected to {self.port}')
+            print('Will attempt continously every 10 seconds')
+            while not self._check_port():
+                time.sleep(10)
+
         self.sensor = minimalmodbus.Instrument(self.port,
                                                self.sensor_address,
                                                mode=minimalmodbus.MODE_RTU,
@@ -52,6 +61,17 @@ class WTVB01(MTCDevice):
         print("MTConnect Adapter for WTVB01-485 vibration sensor")
         print("(c) Concordia University DemoFactory 2024")
         print("============================================================")
+
+    def _check_port(self):
+        """
+        Attempts to open the serial port
+        """
+        try:
+            f_id = os.open(self.port, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+            os.close(f_id)
+            return True
+        except FileNotFoundError:
+            return False
 
     def health_check(self):
         """
