@@ -61,6 +61,11 @@ class WTVB01(MTCDevice):
         print("MTConnect Adapter for WTVB01-485 vibration sensor")
         print("(c) Concordia University DemoFactory 2024")
         print("============================================================")
+        print(f"USB port: {self.port}")
+        if self.health_check():
+            print("Sensor connected")
+        else:
+            print(f"The device connected on {self.port} is not a WTVB01 sensor")
 
     def _check_port(self):
         """
