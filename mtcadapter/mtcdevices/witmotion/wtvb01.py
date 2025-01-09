@@ -86,8 +86,9 @@ class WTVB01(MTCDevice):
             self.temperature()
             self.__available__ = 1
             return True
-        except IOError:
+        except (IOError, termios.error):
             self.__available__ = 0
+            self.sensor.serial.close()
             return False
 
     def manufacturer(self):
